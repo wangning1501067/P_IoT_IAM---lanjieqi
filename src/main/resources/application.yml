@@ -1,0 +1,79 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+    session:
+      #Duration转换字符串方式，默认为正，负以-开头，紧接着P，（字母不区分大小写）D ：天 T：天和小时之间的分隔符 H ：小时 M：分钟 S：秒 每个单位都必须是数字，且时分秒顺序不能乱。例：PT2H就是2个小时，7200秒。
+      #timeout: PT10S  #以秒为单位(session超时时间)
+
+    #Session超时时间设置，单位是秒，默认是30分钟
+      timeout: 5s
+
+websocket:
+  server:
+    path: 192.168.23.31:8081/iam
+
+# 配置数据源
+spring:
+  servlet:
+    multipart:
+      #设置单个文件的大小
+      max-file-size: 10MB
+      #设置单次请求的文件的总大小,如果是想要不限制文件上传的大小，那么就把两个值都设置为-1
+      max-request-size: 200MB
+
+  profiles:
+    active: dev
+  datasource:
+    name: ${DATA_BASE:bys_iot}
+    url: jdbc:postgresql://${P_DB_SERVER_HOST:10.8.7.111}:${P_DB_SERVER_PORT:5432}/${P_DB_DATABASE:bys_iot}?useUnicode=true&characterEncoding=UTF8&useSSL=false
+    username: ${P_DB_USER_NAME:bys}
+    password: ${P_DB_PASSWORD:bys2018}
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.postgresql.Driver
+    druid:
+      maxActive: 1000
+      initial-size: 10
+      min-idle: 10
+      max-wait: 60000
+      #在空闲连接回收器线程运行期间休眠的时间值,以毫秒为单位.如果设置为非正数,则不运行空闲连接回收器线程
+      time-between-connect-error-millis: 60000
+      # 连接在池中保持空闲而不被空闲连接回收器线程(如果有)回收的最小时间值，单位毫秒
+      min-evictable-idle-time-millis: 300000
+      # SQL查询,用来验证从连接池取出的连接,在将连接返回给调用者之前.如果指定,则查询必须是一个SQL SELECT并且必须返回至少一行记录
+      validation-query: select 'x'
+      # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除.
+      #  注意: 设置为true后如果要生效,validationQuery参数必须设置为非空字符串
+      test-while-idle: true
+      # 指明是否在从池中取出连接前进行检验,如果检验失败,则从池中去除连接并尝试取出另一个.
+      # 注意: 设置为true后如果要生效,validationQuery参数必须设置为非空字符串
+      test-on-borrow: false
+      # 指明是否在归还到池中前进行检验
+      test-on-return: false
+      # 开启池的prepared statement 池功能
+      pool-prepared-statements: true
+      # statement池能够同时分配的打开的statements的最大数量, 如果设置为0表示不限制
+      max-pool-prepared-statement-per-connection-size: 0
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 2000
+
+mybatis:
+  mapper-locations: classpath:mapping/**/*Mapper.xml
+  type-aliases-package: com.beyondsoft.box.*.mapper
+
+logging:
+  level:
+    com.beyondsoft.rdc.cloud.iot.iam: debug
+
+fdfs:
+  connect-timeout: 10000
+  so-timeout: 3000
+  tracker-list:
+    - ${TRACKER_1:10.8.7.111:22122}
+  #fastdfs服务ip
+  fastdfs-server-address: ${FASTDFS_SERVER_ADDRESS:10.8.7.111}
+  #fastdfs服务端口
+  fastdfs-server-port: ${FASTDFS_SERVER_PORT:8888}

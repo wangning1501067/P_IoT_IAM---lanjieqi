@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.beyondsoft.rdc.cloud.iot.iam.server.area.mapper.IamAreaMapper" >
+    <resultMap id="BaseResultMap" type="com.beyondsoft.rdc.cloud.iot.iam.server.area.model.IamAreaVo" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="area_name" property="areaName" jdbcType="VARCHAR" />
+        <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+        <result column="level" property="level" jdbcType="INTEGER" />
+        <result column="merchant_id" property="merchantId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+    id, area_name, parent_id, level, create_time, update_time, merchant_id
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from iam.iam_area
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iam.iam_area
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.area.model.IamAreaDo" >
+    insert into iam.iam_area (area_name, parent_id,
+      level, merchant_id
+      )
+    values (#{areaName,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER},
+      #{level,jdbcType=INTEGER}, #{merchantId,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.area.model.IamAreaDo" >
+        insert into iam.iam_area
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="areaName != null" >
+                area_name,
+            </if>
+            <if test="parentId != null" >
+                parent_id,
+            </if>
+            <if test="level != null" >
+                level,
+            </if>
+            <if test="merchantId != null" >
+                merchant_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="areaName != null" >
+                #{areaName,jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null" >
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="level != null" >
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="merchantId != null" >
+                #{merchantId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.area.model.IamAreaDo" >
+        update iam.iam_area
+        <set >
+            <if test="areaName != null" >
+                area_name = #{areaName,jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null" >
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="level != null" >
+                level = #{level,jdbcType=INTEGER},
+            </if>
+            update_time = now(),
+            <if test="merchantId != null" >
+                merchant_id = #{merchantId,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.area.model.IamAreaDo" >
+    update iam.iam_area
+    set area_name = #{areaName,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      level = #{level,jdbcType=INTEGER},
+      update_time = now(),
+      merchant_id = #{merchantId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <select id="getList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from iam.iam_area
+        where merchant_id = #{merchantId}
+        order by create_time desc
+    </select>
+
+    <select id="getByParentIdList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from iam.iam_area
+        where parent_id = #{parentId,jdbcType=INTEGER}
+        order by create_time desc
+    </select>
+
+    <select id="selectChild" parameterType="int" resultType="int">
+        select
+        count(1)
+        from iam.iam_area
+        where parent_id = #{parentId,jdbcType=INTEGER}
+    </select>
+
+    <!--查询空间是够被引用-->
+    <select id="selectSpaceReference" parameterType="int" resultType="int">
+        WITH RECURSIVE r AS (
+          SELECT * FROM iam.iam_area s WHERE s.id = #{id}
+            union   ALL
+	      SELECT c.* FROM iam.iam_area c, r WHERE c.id = r.parent_id
+        )
+SELECT sum(case when num = 0 then 0  else num end) num from (
+        select count(1) num from iam.iam_device d where d.status = 1 and d.device_location like (select string_agg(id||'',',')||'%' from (
+        SELECT id FROM r ORDER BY id) a)
+        ) m
+    </select>
+
+    <select id="selectVresaSpaceReference" parameterType="int" resultType="int">
+    WITH RECURSIVE r AS (
+    SELECT * FROM iam.iam_area s WHERE s.id = #{id}
+    union   ALL
+    SELECT c.* FROM iam.iam_area c, r WHERE r.id = c.parent_id
+    )
+    SELECT sum(case when num = 0 then 0  else num end) num from (
+    select count(1) num from iam.iam_device d where d.status = 1 and d.area_id like (select string_agg(id||'',',')||'%' from (
+    SELECT id FROM r ORDER BY id) a)
+    ) m
+    </select>
+
+    <!--删除目录 逻辑删除-->
+    <delete id="deleteArea" parameterType="int">
+        WITH RECURSIVE r AS (
+         SELECT * FROM iam.iam_area
+         WHERE id = #{id}
+         union ALL
+         SELECT area.* FROM iam.iam_area area, r WHERE area.parent_id = r.id
+        )
+      delete from iam.iam_area where id in (SELECT id FROM r ORDER BY id )
+    </delete>
+
+
+    <!--根据Name查询对应信息-->
+    <select id="selectSpaceByName" resultMap="BaseResultMap">
+        <!--不加if条件时，是新建空间名称时需要查询同应用下同级别有没有重复的名称-->
+        select * from iam.iam_area
+        where area_name = #{areaName}
+        and parent_id = #{parentId}
+        <if test="id != null">
+            <!--修改空间名称时需要查询除本条记录之外，同应用下同级别有没有重复的名称-->
+            and <![CDATA[ id <> #{id} ]]>
+        </if>
+    </select>
+
+    <!--新增同级或者子级目录-->
+    <insert id="addSpace" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.area.model.IamAreaDo">
+        <!--<selectKey resultType="int" order="AFTER" keyProperty="id">
+            select currval('"iam".id_seq'::regclass) as id
+        </selectKey>-->
+        insert into iam.iam_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="areaName != null">
+                area_name,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="merchantId != null" >
+                merchant_id,
+            </if>
+        </trim>
+        <trim prefix=" values (" suffix=")" suffixOverrides=",">
+            <if test="areaName != null">
+                #{areaName},
+            </if>
+            <if test="parentId != null">
+                #{parentId},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+            <if test="level != null">
+                #{level},
+            </if>
+            <if test="merchantId != null" >
+                #{merchantId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <!--查询区域-->
+    <select id="getAreaByAreaName" resultType="java.lang.String">
+        select string_agg(area_name ||'' , ',') from iam.iam_area
+        where id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

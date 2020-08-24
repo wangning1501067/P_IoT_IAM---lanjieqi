@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.beyondsoft.rdc.cloud.iot.iam.server.images.mapper.ImagesDeviceMapper" >
+  <resultMap id="BaseResultMap" type="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDeviceVo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="images_id" property="imagesId" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="INTEGER" />
+    <result column="device_area" property="deviceArea" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR"/>
+    <result column="device_number" property="deviceNumber" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, images_id, device_id, device_area
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iam.iam_images_device
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iam.iam_images_device
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDeviceDo" >
+    insert into iam.iam_images_device (images_id, device_id,
+      device_area)
+    values (#{imagesId,jdbcType=INTEGER}, #{deviceId,jdbcType=INTEGER},
+      #{deviceArea,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDeviceDo" >
+    insert into iam.iam_images_device
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="imagesId != null" >
+        images_id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="deviceArea != null" >
+        device_area,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="imagesId != null" >
+        #{imagesId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceArea != null" >
+        #{deviceArea,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDeviceDo" >
+    update iam.iam_images_device
+    <set >
+      <if test="imagesId != null" >
+        images_id = #{imagesId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceArea != null" >
+        device_area = #{deviceArea,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDeviceDo" >
+    update iam.iam_images_device
+    set images_id = #{imagesId,jdbcType=INTEGER},
+      device_id = #{deviceId,jdbcType=INTEGER},
+      device_area = #{deviceArea,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into iam.iam_images_device (images_id, device_id,
+    device_area)
+    values
+    <foreach collection="imagesDeviceDoList" item="imagesDeviceDo" index="index" separator=",">
+      (
+        #{imagesDeviceDo.imagesId,jdbcType=INTEGER},
+        #{imagesDeviceDo.deviceId,jdbcType=INTEGER},
+        #{imagesDeviceDo.deviceArea,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteImagesId" parameterType="java.lang.Integer" >
+    delete from iam.iam_images_device
+    where images_id = #{imagesId,jdbcType=INTEGER}
+  </delete>
+
+  <!--批量删除-->
+  <delete id="batchDeleteImagesDevice">
+    delete from iam.iam_images_device
+    where images_id in
+    <foreach collection="imagesIdList" item="imagesId" open="(" separator="," close=")">
+      #{imagesId}
+    </foreach>
+  </delete>
+
+  <!--图片下设备集合-->
+  <select id="getImagesByDevice" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+      iid.ID,
+      iid.images_id,
+      iid.device_id,
+      iid.device_area,
+      id.device_name,
+      id.device_number
+    from iam.iam_images_device iid
+    left join iam.iam_device id on iid.device_id = id.id
+    where iid.images_id = #{imagesId,jdbcType=INTEGER}
+  </select>
+
+  <!--图片下设备集合-->
+  <select id="getImagesByDeviceBatch" resultMap="BaseResultMap">
+    select
+      iid.ID,
+      iid.images_id,
+      iid.device_id,
+      iid.device_area,
+      id.device_name,
+      id.device_number
+    from iam.iam_images_device iid
+    left join iam.iam_device id on iid.device_id = id.id
+    where iid.images_id in
+    <foreach collection="imagesIdList" item="imagesId" open="(" separator="," close=")">
+      #{imagesId}
+    </foreach>
+  </select>
+
+  <!--批量删除-->
+  <delete id="batchDeleteImagesDeviceByDeviceId">
+    delete from iam.iam_images_device
+    where device_id in
+    <foreach collection="deviceIdList" item="deviceId" open="(" separator="," close=")">
+      #{deviceId}
+    </foreach>
+  </delete>
+</mapper>

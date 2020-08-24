@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.beyondsoft.rdc.cloud.iot.iam.server.device.mapper.IamDeviceMapper">
+    <resultMap id="BaseResultMap" type="com.beyondsoft.rdc.cloud.iot.iam.server.device.model.IamDeviceVo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="device_name" property="deviceName" jdbcType="VARCHAR"/>
+        <result column="device_location" property="deviceLocation" jdbcType="VARCHAR"/>
+        <result column="device_number" property="deviceNumber" jdbcType="VARCHAR"/>
+        <result column="merchant_id" property="merchantId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, device_name, device_location, device_number, merchant_id, status, create_time, update_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from iam.iam_device
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.device.model.IamDeviceDo">
+    insert into iam.iam_device (device_name, device_location,
+      status
+      )
+    values (#{deviceName,jdbcType=VARCHAR}, #{deviceLocation,jdbcType=VARCHAR},
+      #{status,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.device.model.IamDeviceDo">
+        insert into iam.iam_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceName != null">
+                device_name,
+            </if>
+            <if test="deviceLocation != null">
+                device_location,
+            </if>
+            <if test="deviceNumber != null">
+                device_number,
+            </if>
+            <if test="merchantId != null">
+                merchant_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceName != null">
+                #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceLocation != null">
+                #{deviceLocation,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceNumber != null">
+                #{deviceNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="merchantId != null">
+                #{merchantId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.device.model.IamDeviceDo">
+        update iam.iam_device
+        <set>
+            <if test="deviceName != null">
+                device_name = #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceLocation != null">
+                device_location = #{deviceLocation,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceNumber != null">
+                device_number = #{deviceNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="merchantId != null">
+                merchant_id = #{merchantId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            update_time = now(),
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.device.model.IamDeviceDo">
+    update iam.iam_device
+    set device_name = #{deviceName,jdbcType=VARCHAR},
+      device_location = #{deviceLocation,jdbcType=VARCHAR},
+      device_number = #{deviceNumber,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      update_time = now()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <update id="updateByDeviceId">
+    update iam.iam_device
+    set status = #{status,jdbcType=INTEGER},
+      update_time = now()
+    where device_number = #{deviceNumber,jdbcType=VARCHAR} and merchant_id = #{merchantId,jdbcType=INTEGER}
+  </update>
+
+
+    <!-- 查询 -->
+    <select id="getList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where
+        <if test="deviceLocation != null">
+            device_location like concat(#{deviceLocation,jdbcType=VARCHAR},'%') and
+        </if>
+        <if test="status != null">
+            status = #{status,jdbcType=INTEGER} and
+        </if>
+        <if test="deviceName != null">
+            device_name like concat('%',#{deviceName,jdbcType=VARCHAR},'%') and
+        </if>
+        1=1
+        order by create_time desc
+    </select>
+
+    <select id="getListArea" resultType="java.lang.String">
+        select
+            device_location
+        from iam.iam_device
+        group by device_location
+    </select>
+
+    <select id="getByAreaList" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where  device_location like concat(#{deviceLocation,jdbcType=VARCHAR},'%')
+        order by create_time desc
+    </select>
+
+    <select id="getByStatusList" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where  status = #{status,jdbcType=INTEGER}
+        order by create_time desc
+    </select>
+
+    <select id="getByDeviceNameList" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where  device_name like concat('%',#{deviceName,jdbcType=VARCHAR},'%')
+        order by create_time desc
+    </select>
+
+    <select id="getByNameAndId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where merchant_id = #{merchantId,jdbcType=INTEGER}
+        and device_name = #{deviceName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getByNumberAndId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where merchant_id = #{merchantId,jdbcType=INTEGER}
+        and device_number = #{deviceNumber,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getDeviceByUserId" resultMap="BaseResultMap">
+        select
+        id.ID,
+        id.device_name,
+        id.device_location,
+        id.device_number,
+        id.merchant_id,
+        id.status,
+        id.create_time,
+        id.update_time
+        from iam.iam_device id
+        LEFT JOIN iam.iam_merchant im on im.id = id.merchant_id
+        where im.user_id = #{userId,jdbcType=INTEGER}
+        and id.device_number = #{deviceNumber,jdbcType=VARCHAR}
+    </select>
+
+
+
+    <select id="getByBusinessId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from iam.iam_device
+        where merchant_id = #{merchantId,jdbcType=INTEGER}
+    </select>
+</mapper>

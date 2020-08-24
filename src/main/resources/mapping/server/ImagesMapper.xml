@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.beyondsoft.rdc.cloud.iot.iam.server.images.mapper.ImagesMapper" >
+  <resultMap id="BaseResultMap" type="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesVo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="images_path" property="imagesPath" jdbcType="VARCHAR" />
+    <result column="images_name" property="imagesName" jdbcType="VARCHAR" />
+    <result column="images_start_time" property="imagesStartTime" jdbcType="TIMESTAMP" />
+    <result column="images_end_time" property="imagesEndTime" jdbcType="TIMESTAMP" />
+    <result column="images_time_start" property="imagesTimeStart" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="merchant_id" property="merchantId" jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, images_path, images_name, images_start_time, images_end_time, images_time_start, create_time,
+    update_time, merchant_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iam.iam_images
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iam.iam_images
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDo" >
+    insert into iam.iam_images (images_path, images_name, images_start_time,
+      images_end_time, images_time_start, merchant_id)
+    values (#{imagesPath,jdbcType=VARCHAR}, #{imagesName,jdbcType=VARCHAR}, #{imagesStartTime,jdbcType=TIMESTAMP},
+      #{imagesEndTime,jdbcType=TIMESTAMP}, #{imagesTimeStart,jdbcType=INTEGER}, #{merchantId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDo" useGeneratedKeys="true" keyProperty="id">
+    insert into iam.iam_images
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="imagesPath != null" >
+        images_path,
+      </if>
+      <if test="imagesName != null" >
+        images_name,
+      </if>
+      <if test="imagesStartTime != null" >
+        images_start_time,
+      </if>
+      <if test="imagesEndTime != null" >
+        images_end_time,
+      </if>
+      <if test="imagesTimeStart != null" >
+        images_time_start,
+      </if>
+      <if test="merchantId != null" >
+        merchant_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="imagesPath != null" >
+        #{imagesPath,jdbcType=VARCHAR},
+      </if>
+      <if test="imagesName != null" >
+        #{imagesName,jdbcType=VARCHAR},
+      </if>
+      <if test="imagesStartTime != null" >
+        #{imagesStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="imagesEndTime != null" >
+        #{imagesEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="imagesTimeStart != null" >
+        #{imagesTimeStart,jdbcType=INTEGER},
+      </if>
+      <if test="merchantId != null" >
+        #{merchantId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDo" >
+    update iam.iam_images
+    <set >
+      <if test="imagesPath != null" >
+        images_path = #{imagesPath,jdbcType=VARCHAR},
+      </if>
+      <if test="imagesName != null" >
+        images_name = #{imagesName,jdbcType=VARCHAR},
+      </if>
+      <!--<if test="imagesStartTime != null" >-->
+        images_start_time = #{imagesStartTime,jdbcType=TIMESTAMP},
+      <!--</if>-->
+      <!--<if test="imagesEndTime != null" >-->
+        images_end_time = #{imagesEndTime,jdbcType=TIMESTAMP},
+      <!--</if>-->
+      <if test="imagesTimeStart != null" >
+        images_time_start = #{imagesTimeStart,jdbcType=INTEGER},
+      </if>
+      <if test="merchantId != null" >
+        merchant_id = #{merchantId,jdbcType=INTEGER},
+      </if>
+      update_time = now(),
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesDo" >
+    update iam.iam_images
+    set images_path = #{imagesPath,jdbcType=VARCHAR},
+        images_name = #{imagesName,jdbcType=VARCHAR},
+      images_start_time = #{imagesStartTime,jdbcType=TIMESTAMP},
+      images_end_time = #{imagesEndTime,jdbcType=TIMESTAMP},
+      images_time_start = #{imagesTimeStart,jdbcType=INTEGER},
+      merchant_id = #{merchantId,jdbcType=INTEGER},
+      update_time = now()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--查询设备下照片-->
+  <select id="getDeviceByImages" resultMap="BaseResultMap">
+    select
+        ii.id,
+        ii.images_name,
+        ii.images_path,
+        ii.create_time,
+        ii.images_start_time,
+        ii.images_end_time,
+        ii.images_time_start
+     from iam.iam_images ii
+      LEFT JOIN iam.iam_images_device iid on iid.images_id = ii.id
+      LEFT JOIN iam.iam_device id on id.id = iid.device_id
+    where id.merchant_id = #{merchantId,jdbcType=INTEGER}
+    <if test="deviceCode != null" >
+        and id.device_number = #{deviceCode,jdbcType=VARCHAR}
+    </if>
+    <if test="imagesName != null" >
+      and ii.images_name = #{imagesName,jdbcType=VARCHAR}
+    </if>
+    GROUP BY
+      ii.ID,
+      ii.images_name,
+      ii.images_path,
+      ii.create_time,
+      ii.images_start_time,
+      ii.images_end_time,
+      ii.images_time_start
+    order by ii.create_time asc
+  </select>
+
+  <!--批量删除-->
+  <delete id="batchDeleteImages">
+    delete from iam.iam_images
+    where id in
+    <foreach collection="imagesIdList" item="imagesId" open="(" separator="," close=")">
+      #{imagesId}
+    </foreach>
+  </delete>
+
+  <!--根据标签获取图片-->
+  <select id="getLabelByImages" resultType="java.util.Map">
+    select
+        iil.images_id as imagesid,
+		ii.create_time as createtime ,
+		ii.images_path as imagespath,
+		ii.images_start_time as imagesstarttime,
+		ii.images_end_time as imagesendtime,
+		ii.images_time_start as imagestimestart,
+        iid.device_id as deviceid,
+        id.device_number as devicenumber,
+        id.merchant_id as marchentId,
+		count(iil.images_id) as count
+    from iam.iam_images_label iil
+        LEFT JOIN iam.iam_label il on il.id = iil.label_id
+        LEFT JOIN iam.iam_images ii on ii.id = iil.images_id
+        LEFT JOIN iam.iam_images_device iid on iid.images_id = ii.id
+        LEFT JOIN iam.iam_device id on id.id = iid.device_id
+		where id.device_number = #{deviceName}
+		and id.merchant_id = #{merchantId}
+		and il.label_name in
+    <foreach collection="labelNameList" item="labelName" open="(" separator="," close=")">
+      #{labelName}
+    </foreach>
+	group by iil.images_id,
+		ii.create_time,
+        ii.images_path,
+        ii.images_start_time,
+        ii.images_end_time,
+        ii.images_time_start,
+        iid.device_id,
+        id.device_number,
+        id.merchant_id
+	order by ii.create_time asc
+  </select>
+
+  <!-- 根据图片ID获取多个图片-->
+  <select id="getImagesList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iam.iam_images
+    where id in
+    <foreach collection="imagesIdList" item="imagesId" open="(" separator="," close=")">
+      #{imagesId}
+    </foreach>
+  </select>
+
+  <!--根据商户查询图片-->
+  <select id="getImagesBymerchantId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iam.iam_images
+    where merchant_id = #{merchantId}
+  </select>
+</mapper>

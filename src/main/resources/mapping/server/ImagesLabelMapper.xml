@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.beyondsoft.rdc.cloud.iot.iam.server.images.mapper.ImagesLabelMapper" >
+  <resultMap id="BaseResultMap" type="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesLabelVo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="images_id" property="imagesId" jdbcType="INTEGER" />
+    <result column="label_id" property="labelId" jdbcType="INTEGER" />
+    <result column="label_type" property="labelType" jdbcType="INTEGER" />
+    <result column="label_name" property="labelName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, images_id, label_id, label_type
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iam.iam_images_label
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iam.iam_images_label
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesLabelDo" >
+    insert into iam.iam_images_label (images_id, label_id,
+      label_type)
+    values (#{imagesId,jdbcType=INTEGER}, #{labelId,jdbcType=INTEGER},
+      #{labelType,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesLabelDo" >
+    insert into iam.iam_images_label
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="imagesId != null" >
+        images_id,
+      </if>
+      <if test="labelId != null" >
+        label_id,
+      </if>
+      <if test="labelType != null" >
+        label_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="imagesId != null" >
+        #{imagesId,jdbcType=INTEGER},
+      </if>
+      <if test="labelId != null" >
+        #{labelId,jdbcType=INTEGER},
+      </if>
+      <if test="labelType != null" >
+        #{labelType,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesLabelDo" >
+    update iam.iam_images_label
+    <set >
+      <if test="imagesId != null" >
+        images_id = #{imagesId,jdbcType=INTEGER},
+      </if>
+      <if test="labelId != null" >
+        label_id = #{labelId,jdbcType=INTEGER},
+      </if>
+      <if test="labelType != null" >
+        label_type = #{labelType,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.images.model.ImagesLabelDo" >
+    update iam.iam_images_label
+    set images_id = #{imagesId,jdbcType=INTEGER},
+      label_id = #{labelId,jdbcType=INTEGER},
+      label_type = #{labelType,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into iam.iam_images_label (images_id, label_id,
+    label_type)
+    values
+    <foreach collection="imagesLabelDoList" item="imagessLabelDo" index="index" separator=",">
+      (
+        #{imagessLabelDo.imagesId,jdbcType=INTEGER},
+        #{imagessLabelDo.labelId,jdbcType=INTEGER},
+        #{imagessLabelDo.labelType,jdbcType=INTEGER}
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteImagesId" parameterType="java.lang.Integer" >
+    delete from iam.iam_images_label
+    where images_id = #{imagesId,jdbcType=INTEGER}
+  </delete>
+
+  <!--批量删除-->
+  <delete id="batchDeleteImagesLabel">
+    delete from iam.iam_images_label
+    where images_id in
+    <foreach collection="imagesIdList" item="imagesId" open="(" separator="," close=")">
+      #{imagesId}
+    </foreach>
+  </delete>
+
+  <!--图片下标签集合-->
+  <select id="getImagesByLabel" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+      iil.ID,
+      iil.images_id,
+      iil.label_id,
+      iil.label_type,
+      il.label_name
+    from iam.iam_images_label iil
+    left join iam.iam_label il on iil.label_id = il.id
+    where iil.images_id = #{imagesId,jdbcType=INTEGER}
+  </select>
+</mapper>
