@@ -92,11 +92,33 @@ public class WebSocketServer {
             log.error("websocket IO连接异常", e);
         }
 
-        session.setMaxIdleTimeout(1000 * 60 * 5);
+
+        session.setMaxIdleTimeout(shutdown());
 
         //修改设备状态
         iamDeviceService.updateByDeviceId(Integer.valueOf(merchantId),deviceCode,1);
 
+    }
+
+    public Long shutdown(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int seconds = 300000;
+                while (seconds > 0) {
+                    try {
+                        Thread.sleep(1000);
+                        seconds--;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(seconds == 0){
+                    onClose();
+                }
+            }
+        }).start();
+        return 300000L;
     }
 
     /*private Object getResult() {

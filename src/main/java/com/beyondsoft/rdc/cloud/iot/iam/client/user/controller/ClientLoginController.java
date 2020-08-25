@@ -49,9 +49,8 @@ public class ClientLoginController {
         ObjectRestResponse<Object> restResponse = new ObjectRestResponse<>();
         if(session!=null){
             //IamUserVo user = (IamUserVo)session.getAttribute(SessionConstant.NAME);//从当前session中获取用户信息
-            MySessionContext.getInstance().removeSession(session);
             session.removeAttribute(SessionConstant.CLIENT_SESSION_USER);
-            //session.invalidate();//关闭session
+            session.invalidate();//关闭session
         }
         return restResponse;
     }

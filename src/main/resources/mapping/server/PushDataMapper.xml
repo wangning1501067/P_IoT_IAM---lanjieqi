@@ -201,4 +201,18 @@
             #{deviceId}
         </foreach>
     </delete>
+
+    <!--推送广告性别统计-->
+    <select id="getSexData" resultType="java.util.Map">
+        select
+            l.label_name  as labelname,
+            count(1) as count
+        from iam.iam_label  l
+        INNER JOIN iam.iam_images_label il on il.label_id = l.id
+        INNER JOIN iam.iam_push_data pd on pd.images_id = il.images_id
+        where l.label_type = #{labelType}
+        AND pd.push_date BETWEEN #{startDate} AND #{endDate}
+        AND pd.merchant_id = #{merchantId}
+        GROUP BY label_name
+  </select>
 </mapper>

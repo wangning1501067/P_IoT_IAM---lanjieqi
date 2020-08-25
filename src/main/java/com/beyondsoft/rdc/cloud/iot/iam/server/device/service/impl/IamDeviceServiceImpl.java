@@ -80,7 +80,7 @@ public class IamDeviceServiceImpl implements IamDeviceService {
         if(!ObjectUtils.isEmpty(byNumberAndId)){
             throw new GeneralException(InternationEnum.KEY_DEVICE_ALREADY_EXISTS.getLanguage(GlobalValue.getLanguage()));
         }
-        record.setStatus(1);
+        record.setStatus(0);
         IamDeviceDo device = new IamDeviceDo();
         BeanUtils.copyProperties(record, device);
         log.info("添加设备==> {" + device + "}");

@@ -35,4 +35,6 @@ public interface PushDataMapper {
     List<Map<String, Object>> getDeviceList(@Param("merchantId") Integer merchantId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     int batchDeleteByDeviceId(@Param("deviceIdList") List<Integer> deviceIdList);
+
+    List<Map<String, Object>> getSexData(@Param("labelType") Integer labelType, @Param("merchantId") Integer merchantId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }

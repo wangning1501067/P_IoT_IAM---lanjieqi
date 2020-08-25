@@ -28,8 +28,7 @@ public class SessionFilter implements Filter {
             "/no-login/",
             "/server/user/",
             "/socket",
-            "/iam/client/label/labelImages",
-            "register"
+            "/iam/client/label/labelImages"
     };
 
 
@@ -55,9 +54,9 @@ public class SessionFilter implements Filter {
             if (uri.contains("/server/")) {
                 ifEnd(filterChain, request, response, session, SessionConstant.SERVER_SESSION_USER, this.SERVER_NO_LOGIN);
             }else if (uri.contains("/client/")){
-                ifEnd(filterChain, request, response, session, SessionConstant.CLIENT_SESSION_USER, this.CLIENT_NO_LOGIN);
+                //ifEnd(filterChain, request, response, session, SessionConstant.CLIENT_SESSION_USER, this.CLIENT_NO_LOGIN);
+                filterChain.doFilter(servletRequest, servletResponse);
             }
-            return ;
         }
     }
 

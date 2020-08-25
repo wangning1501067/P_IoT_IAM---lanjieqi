@@ -89,4 +89,18 @@ public class DataController {
         restResponse.setData(pageInfo);
         return restResponse;
     }
+
+    /**
+     * 推送广告性别统计
+     */
+    @GetMapping("/getSexData")
+    public ObjectRestResponse getSexData(@RequestParam("labelType") Integer labelType,
+                                         @RequestParam("merchantId") Integer merchantId,
+                                            @RequestParam("startTime") Long startTime,
+                                            @RequestParam("endTime") Long endTime) {
+        ObjectRestResponse<Object> restResponse = new ObjectRestResponse<>();
+        List<Map<String, Object>> resultMap = this.pushDataService.getSexData(labelType, merchantId, startTime, endTime);
+        restResponse.setData(resultMap);
+        return restResponse;
+    }
 }

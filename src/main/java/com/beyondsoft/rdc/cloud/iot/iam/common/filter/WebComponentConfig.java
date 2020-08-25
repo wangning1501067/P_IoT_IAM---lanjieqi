@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class WebComponentConfig {
-    /*@Bean
+    @Bean
     public FilterRegistrationBean someFilterRegistration1() {
         //新建过滤器注册类
         FilterRegistrationBean registration = new FilterRegistrationBean();
@@ -17,7 +17,7 @@ public class WebComponentConfig {
         registration.addUrlPatterns("/*");
         registration.setOrder(2);//order的数值越小 则优先级越高
         return registration;
-    }*/
+    }
 
     @Bean
     public FilterRegistrationBean someFilterRegistration2() {

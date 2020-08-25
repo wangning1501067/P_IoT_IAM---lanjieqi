@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.beyondsoft.rdc.cloud.iot.iam.server.push.mapper.FlowMapper" >
+  <resultMap id="BaseResultMap" type="com.beyondsoft.rdc.cloud.iot.iam.server.push.model.FlowVo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+    <result column="men_num" property="menNum" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="push_date" property="pushDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, merchant_id, men_num, device_id, create_time, update_time, push_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iam.iam_flow
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iam.iam_flow
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.push.model.FlowDo" >
+    insert into iam.iam_flow (id, merchant_id, men_num, 
+      device_id,
+      push_date)
+    values (#{id,jdbcType=INTEGER}, #{merchantId,jdbcType=INTEGER}, #{menNum,jdbcType=INTEGER}, 
+      #{deviceId,jdbcType=INTEGER},
+      #{pushDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.push.model.FlowDo" >
+    insert into iam.iam_flow
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="merchantId != null" >
+        merchant_id,
+      </if>
+      <if test="menNum != null" >
+        men_num,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="pushDate != null" >
+        push_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="merchantId != null" >
+        #{merchantId,jdbcType=INTEGER},
+      </if>
+      <if test="menNum != null" >
+        #{menNum,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="pushDate != null" >
+        #{pushDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.push.model.FlowDo" >
+    update iam.iam_flow
+    <set >
+      <if test="merchantId != null" >
+        merchant_id = #{merchantId,jdbcType=INTEGER},
+      </if>
+      <if test="menNum != null" >
+        men_num = #{menNum,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pushDate != null" >
+        push_date = #{pushDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.beyondsoft.rdc.cloud.iot.iam.server.push.model.FlowDo" >
+    update iam.iam_flow
+    set merchant_id = #{merchantId,jdbcType=INTEGER},
+      men_num = #{menNum,jdbcType=INTEGER},
+      device_id = #{deviceId,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      push_date = #{pushDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 区域客流 -->
+  <select id="getFlowByArea" resultType="java.util.Map">
+    select
+      d.device_name as devicename,
+      sum(f.men_num)
+    from iam.iam_flow f
+    INNER JOIN iam.iam_device d on d.id = f.device_id
+      where 1=1
+      AND f.push_date BETWEEN #{startDate} AND #{endDate}
+      AND f.merchant_id = #{merchantId}
+    GROUP BY d.device_name
+  </select>
+
+  <select id="getFlowList" resultMap="BaseResultMap">
+    select
+        <include refid="Base_Column_List" />
+    from iam.iam_flow
+      where 1=1
+      AND push_date BETWEEN #{startDate} AND #{endDate}
+      AND merchant_id = #{merchantId}
+
+    order by push_date asc
+  </select>
+
+</mapper>

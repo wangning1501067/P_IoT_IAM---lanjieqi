@@ -2,7 +2,9 @@ package com.beyondsoft.rdc.cloud.iot.iam.server.push.service;
 
 import com.beyondsoft.rdc.cloud.iot.iam.server.push.model.PushDataBo;
 import com.beyondsoft.rdc.cloud.iot.iam.server.push.model.PushDataVo;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +34,6 @@ public interface PushDataService {
     List<Map<String, Object>> getDeviceList(Integer merchantId, Long startTime, Long endTime);
 
     int batchDeleteByDeviceId(List<Integer> deviceIdList);
+
+    List<Map<String, Object>> getSexData(Integer labelType, Integer merchantId, Long startDate, Long endDate);
 }

@@ -143,4 +143,11 @@ public class PushDataServiceImpl implements PushDataService {
     public int batchDeleteByDeviceId(List<Integer> deviceIdList) {
         return this.pushDataMapper.batchDeleteByDeviceId(deviceIdList);
     }
+
+    @Override
+    public List<Map<String, Object>> getSexData(Integer labelType, Integer merchantId, Long startTime, Long endTime) {
+        Date startDate = new Date(startTime);
+        Date endDate = new Date(endTime);
+        return this.pushDataMapper.getSexData(labelType, merchantId, startDate, endDate);
+    }
 }

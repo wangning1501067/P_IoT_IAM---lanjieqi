@@ -2,8 +2,10 @@ package com.beyondsoft.rdc.cloud.iot.iam.common.util;
 
 import com.google.common.collect.Lists;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -72,6 +74,34 @@ public class DateUtil {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 天24小时
+     * @return
+     */
+    public static List getDay24(){
+        List list = Lists.newArrayList();
+        list.addAll(Arrays.asList(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "00"}));
+        return list;
+    }
+
+    /**
+     * 查询指定日期前后指定的天数
+     * @param date 日期对象
+     * @param days 天数
+     * @return 日期对象
+     */
+    public static Date incr(Date date, int days)
+    {
+        if (date == null){
+            return null;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, days);
+        return calendar.getTime();
     }
 
     public static String dateToStr(Date date){
